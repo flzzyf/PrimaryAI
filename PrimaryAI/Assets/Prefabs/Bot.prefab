@@ -184,10 +184,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 3
+  rotateSpeed: 1
   idleTimeRange: {x: 1, y: 3}
   rotateAngleRange: {x: 40, y: 80}
   speedRange: {x: 4, y: 8}
-  eyeSight: 5
+  eyeSight: 10
+  target: {fileID: 0}
+  followers: []
+  followDistance: 10
 --- !u!61 &3295488081122023373
 BoxCollider2D:
   m_ObjectHideFlags: 0

@@ -22,6 +22,8 @@ public class Ant : MonoBehaviour
 
     public List<Ant> followers = new List<Ant>();
 
+    public float followDistance = 10;
+
     void Start()
     {
         //初始随机朝向
@@ -34,10 +36,11 @@ public class Ant : MonoBehaviour
     {
         if(target != null)
         {
-
             return;
         }
 
+
+        //偶尔随机转向
         if(timer > 0)
         {
             timer -= Time.deltaTime;
@@ -50,6 +53,21 @@ public class Ant : MonoBehaviour
             RandomRotate();
         }
 
+        if (followers.Count > 1)
+        {
+            for (int i = followers.Count - 1; i > 0; i--)
+            {
+                //距离太远脱离
+                if(Vector2.Distance(followers[i].transform.position, transform.position) > followDistance)
+                {
+                    followers[i].target = null;
+                    followers.RemoveAt(i);
+                }
+            }
+
+            return;
+        }
+
         //看见其他人
         RaycastHit2D[] hit = Physics2D.RaycastAll(transform.position, transform.up, eyeSight);
         foreach (var item in hit)
@@ -59,6 +77,7 @@ public class Ant : MonoBehaviour
                 if (item.collider.gameObject.tag == "Bot")
                 {
                     FindTarget(item.collider.gameObject);
+                    return;
                 }
             }
         }
@@ -68,11 +87,6 @@ public class Ant : MonoBehaviour
     {
         //前进
         transform.Translate(transform.up * speed * Time.deltaTime, Space.World);
-    }
-
-    private void OnDrawGizmos()
-    {
-        Gizmos.DrawLine(transform.position, transform.position + transform.up * eyeSight);
     }
 
     //发现目标
@@ -96,22 +110,40 @@ public class Ant : MonoBehaviour
         float rotateTime = rotateAngle * rotateSpeed * Time.deltaTime;
         Vector3 targetRotation = transform.eulerAngles + new Vector3(0, 0, sign * rotateAngle);
 
-        transform.DORotate(targetRotation, rotateTime);
-
-        print(rotateTime);
-
-        //如果有追随者，让其也跟着转
-        if(followers.Count > 0)
-        {
-            foreach (var item in followers)
-            {
-                item.RotateTo(targetRotation, rotateTime);
-            }
-        }
+        RotateTo(targetRotation, rotateTime);
     }
 
     public void RotateTo(Vector3 _rotation, float _time)
     {
         transform.DORotate(_rotation, _time);
+
+        //如果有追随者，让其也跟着转
+        if (followers.Count > 0)
+        {
+            foreach (var item in followers)
+            {
+                item.RotateTo(_rotation, _time);
+            }
+        }
     }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.DrawLine(transform.position, transform.position + transform.up * eyeSight);
+
+        if(target != null)
+        {
+            Gizmos.DrawWireSphere(transform.position, .5f);
+        }
+
+        Gizmos.color = Color.green;
+        if (followers.Count > 0)
+        {
+            foreach (var item in followers)
+            {
+                Gizmos.DrawLine(transform.position, item.transform.position);
+            }
+        }
+    }
+
 }
