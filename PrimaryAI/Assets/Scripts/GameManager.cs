@@ -15,10 +15,18 @@ public class GameManager : MonoBehaviour
             Vector2 pos = new Vector2(Random.Range(-1, 1) * createRange, Random.Range(-1, 1) * createRange);
             Instantiate(prefab_bots, pos, Quaternion.identity);
         }
+
+        StartCoroutine(QWE());
     }
 
     void Update()
     {
         
+    }
+
+    IEnumerator QWE()
+    {
+        yield break;
+        print("qwe");
     }
 }
